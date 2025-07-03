@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Set a light gray background for better contrast */
+            background-color: #f0f2f5;
+        }
+        /* Custom focus styles for better accessibility */
+        .focus-styles:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.6); /* Blue focus ring for light theme */
+        }
+        /* Custom placeholder color */
+        .custom-placeholder::placeholder {
+            color: #9ca3af;
+        }
+
+        /* Keyframes for the floating animation */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+            50% {
+                transform: translateY(-8px);
+                box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+            }
+            100% {
+                transform: translateY(0px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* Style for the individual floating icons */
+        .social-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px; /* w-14 */
+            height: 56px; /* h-14 */
+            border-radius: 9999px; /* rounded-full */
+            background-color: #ffffff;
+            animation: float 4s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            animation-play-state: paused; /* Pause floating on hover */
+            transform: translateY(-2px) scale(1.05); /* Slight lift and scale on hover */
+        }
+
+        /* Stagger the animation start times for a more natural effect */
+        .social-icon.instagram {
+            animation-delay: 0s;
+        }
+        .social-icon.telegram {
+            animation-delay: 0.7s;
+        }
+        .social-icon.youtube {
+            animation-delay: 1.4s;
+        }
+        /* Style for disabled button */
+        .disabled-button {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .disabled-button:hover {
+            background-color: #9ca3af;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen m-0 p-4">
+
+    <!-- Main container for the app -->
+    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-6">
+        
+        <!-- App Header with Image -->
+        <div class="text-center">
+            <img src="logo.png" alt="App Logo" class="w-32 h-32 mx-auto rounded-full mb-4 object-cover border-4 border-gray-100 shadow-md" onerror="this.style.display='none'">
+            <p class="text-gray-500 mt-2 text-lg">Type something and I'll read it for you.</p>
+        </div>
+
+        <!-- Text Input Area -->
+        <div>
+            <label for="text-to-read" class="sr-only">Text to read</label>
+            <textarea id="text-to-read" rows="5" class="w-full p-4 border border-gray-300 rounded-lg text-lg text-gray-700 focus-styles transition-shadow custom-placeholder" placeholder="Knowledge is power..."></textarea>
+        </div>
+
+        <!-- Voice Selection Dropdown -->
+        <div>
+            <label for="voice-select" class="sr-only">Choose a voice:</label>
+            <select id="voice-select" class="w-full p-4 border border-gray-300 rounded-lg text-lg text-gray-700 focus-styles transition-shadow custom-placeholder bg-white appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: .65em auto;">
+                <!-- Voice options will be populated by JavaScript -->
+            </select>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-2 gap-4">
+            <button id="read-button" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg text-lg hover:bg-blue-700 active:bg-blue-800 focus-styles transition-all transform active:scale-95">
+                Read Aloud
+            </button>
+            <button id="download-button" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg text-lg hover:bg-green-700 active:bg-green-800 focus-styles transition-all transform active:scale-95">
+                Download
+            </button>
+        </div>
+        
+        <!-- Disclaimer for Download -->
+        <div class="text-center">
+            <p class="text-xs text-gray-500">Note: Downloaded audio is a high-quality version and may differ from the live preview with special effects.</p>
+        </div>
+    </div>
+
+    <!-- Floating Social Media Icons -->
+    <div class="fixed bottom-8 flex items-center space-x-6 left-1/2 -translate-x-1/2">
+        <!-- Instagram Icon -->
+        <a href="https://www.instagram.com/sanjuhvk/?__pwa=1" target="_blank" rel="noopener noreferrer" title="Instagram" class="social-icon instagram group">
+            <svg class="w-8 h-8" viewBox="0 0 24 24" aria-hidden="true">
+                 <defs>
+                    <linearGradient id="instagramGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#feda75;stop-opacity:1" />
+                        <stop offset="25%" style="stop-color:#fa7e1e;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#d62976;stop-opacity:1" />
+                        <stop offset="75%" style="stop-color:#962fbf;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#4f5bd5;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#instagramGradient)" fill-rule="evenodd" d="M12 2C8.74 2 8.273.015 6.75.088c-1.52.073-2.57.348-3.46.72-1.002.378-1.85.88-2.67 1.708S.357 5.23.72 6.292c-.363.962-.648 2.058-.72 3.638C0 11.727 0 12.273 0 15.533c.002 3.26.015 3.727.088 5.25.073 1.52.348 2.57.72 3.46.378 1.002.88 1.85 1.708 2.67s1.67.93 2.67.292c.962.363 2.058.648 3.638.72 1.52.073 1.987.088 5.25.088s3.727-.015 5.25-.088c1.52-.073 2.57-.348 3.46-.72 1.002-.378 1.85-.88 2.67-1.708s.93-1.67.292-2.67c.363-.962.648-2.058.72-3.638.073-1.52.088-1.987.088-5.25s-.015-3.727-.088-5.25c-.073-1.52-.348-2.57-.72-3.46-.378-1.002-.88-1.85-1.708-2.67s-1.67-.93-2.67-.292c-.962-.363-2.058-.648-3.638-.72C15.727 2.015 15.26 2 12 2zm0 4a4 4 0 100 8 4 4 0 000-8zm-6 8a6 6 0 1112 0 6 6 0 01-12 0zm13-8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"/>
+            </svg>
+        </a>
+        <!-- Telegram Icon -->
+        <a href="https://t.me/sanjuhvx" target="_blank" rel="noopener noreferrer" title="Telegram" class="social-icon telegram group">
+            <svg class="w-8 h-8 text-sky-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21.883 12.001L2 18l3.333-7.333L2 3.334l19.883 8.667zM5 16l12-4-12-4v3.5l8 1.5-8 1.5V16z"/>
+            </svg>
+        </a>
+        <!-- YouTube Icon -->
+        <a href="https://www.youtube.com/channel/UCoirCSBz_bYOcYoI26pIPRQ" target="_blank" rel="noopener noreferrer" title="YouTube" class="social-icon youtube group">
+            <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill-rule="evenodd" d="M21.582 6.186a2.69 2.69 0 00-1.898-1.898C18.008 4 12 4 12 4s-6.008 0-7.684.288a2.69 2.69 0 00-1.898 1.898C2 7.864 2 12 2 12s0 4.136.288 5.814a2.69 2.69 0 001.898 1.898C5.992 20 12 20 12 20s6.008 0 7.684-.288a2.69 2.69 0 001.898-1.898C22 16.136 22 12 22 12s0-4.136-.418-5.814zM9.75 15.5V8.5l6.5 3.5-6.5 3.5z" clip-rule="evenodd" />
+            </svg>
+        </a>
+    </div>
+
+    <script>
+        // --- JavaScript for Text-to-Speech functionality ---
+
+        // Get references to the HTML elements we need
+        const readButton = document.getElementById('read-button');
+        const downloadButton = document.getElementById('download-button');
+        const textToReadEl = document.getElementById('text-to-read');
+        const voiceSelect = document.getElementById('voice-select');
+
+        let voices = [];
+
+        // Function to populate the voice select dropdown
+        function populateVoiceList() {
+            voices = window.speechSynthesis.getVoices();
+            voiceSelect.innerHTML = ''; // Clear any existing options
+
+            // --- Create Voice Groups ---
+            const funnyGroup = document.createElement('optgroup');
+            funnyGroup.label = 'Funny Voices';
+            
+            const deepGroup = document.createElement('optgroup');
+            deepGroup.label = 'Deep Voices';
+
+            const femaleGroup = document.createElement('optgroup');
+            femaleGroup.label = 'Female Voices';
+
+            const languageGroup = document.createElement('optgroup');
+            languageGroup.label = 'All Languages';
+
+            // --- Populate Funny Voices ---
+            for(let i = 1; i <= 5; i++) {
+                const option = document.createElement('option');
+                option.textContent = `Funny Voice ${i}`;
+                option.setAttribute('data-name', `funny-${i}`);
+                funnyGroup.appendChild(option);
+            }
+            voiceSelect.appendChild(funnyGroup);
+
+            // --- Populate Deep Voices ---
+             for(let i = 1; i <= 5; i++) {
+                const option = document.createElement('option');
+                option.textContent = `Deep Voice ${i}`;
+                option.setAttribute('data-name', `deep-${i}`);
+                deepGroup.appendChild(option);
+            }
+            voiceSelect.appendChild(deepGroup);
+
+            // --- Populate Female Voices ---
+            const femaleVoices = voices.filter(voice => voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('zira') || voice.name.toLowerCase().includes('samantha'));
+            femaleVoices.slice(0, 5).forEach((voice, i) => {
+                 const option = document.createElement('option');
+                 option.textContent = `Girl Voice ${i + 1} (${voice.lang})`;
+                 option.setAttribute('data-name', voice.name);
+                 femaleGroup.appendChild(option);
+            });
+            if (femaleGroup.childElementCount > 0) {
+                voiceSelect.appendChild(femaleGroup);
+            }
+
+            // --- Populate All Language Voices ---
+            voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.textContent = `${voice.name} (${voice.lang})`;
+                option.setAttribute('data-name', voice.name);
+                languageGroup.appendChild(option);
+            });
+            voiceSelect.appendChild(languageGroup);
+        }
+        
+        // This function sets up the utterance with the correct voice and effects
+        function setupUtterance(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            const selectedOptionName = voiceSelect.selectedOptions[0].getAttribute('data-name');
+            
+            utterance.pitch = 1;
+            utterance.rate = 1;
+            utterance.voice = null;
+
+            if (selectedOptionName.startsWith('funny-')) {
+                const level = parseInt(selectedOptionName.split('-')[1]);
+                utterance.pitch = 1.5 + (level * 0.1);
+                utterance.rate = 1.1 + (level * 0.05);
+            } else if (selectedOptionName.startsWith('deep-')) {
+                const level = parseInt(selectedOptionName.split('-')[1]);
+                utterance.pitch = 0.8 - (level * 0.1);
+                utterance.rate = 0.9 - (level * 0.05);
+            } else {
+                const selectedVoice = voices.find(voice => voice.name === selectedOptionName);
+                if (selectedVoice) utterance.voice = selectedVoice;
+            }
+            return utterance;
+        }
+
+        // Check if the browser supports the required APIs
+        if ('speechSynthesis' in window) {
+            
+            populateVoiceList();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = populateVoiceList;
+            }
+            
+            readButton.addEventListener('click', () => {
+                const text = textToReadEl.value;
+                if (text.trim() === '') return;
+                window.speechSynthesis.cancel();
+                const utterance = setupUtterance(text);
+                window.speechSynthesis.speak(utterance);
+            });
+
+            downloadButton.addEventListener('click', async () => {
+                const text = textToReadEl.value;
+                if (text.trim() === '') return;
+
+                const originalButtonText = downloadButton.innerHTML;
+                downloadButton.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating...`;
+                downloadButton.disabled = true;
+
+                try {
+                    // This uses a public, key-less API from StreamElements for TTS.
+                    // It attempts to match the voice type for the download.
+                    const selectedOption = voiceSelect.selectedOptions[0];
+                    const selectedOptionName = selectedOption.getAttribute('data-name');
+                    let apiVoice = 'Brian'; // Default API voice
+
+                    if (selectedOptionName.startsWith('deep-')) {
+                        apiVoice = 'Brian'; // Use a deep male voice
+                    } else if (selectedOptionName.startsWith('funny-')) {
+                         apiVoice = 'Brian'; // Fallback for funny voice
+                    } else {
+                        // Check if the selected option is in the "Female Voices" group
+                        if (selectedOption.parentElement.label === 'Female Voices') {
+                            apiVoice = 'Emma'; // Use a standard female voice for download
+                        }
+                        // For other specific language voices, the API will use its default (Brian)
+                        // as it may not support that specific language/voice.
+                    }
+
+                    const response = await fetch(`https://api.streamelements.com/kappa/v2/speech?voice=${apiVoice}&text=${encodeURIComponent(text)}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API request failed with status ${response.status}`);
+                    }
+
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'speech.mp3';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+
+                } catch (error) {
+                    console.error('Download failed:', error);
+                    alert('Sorry, the audio could not be downloaded.');
+                } finally {
+                    downloadButton.innerHTML = originalButtonText;
+                    downloadButton.disabled = false;
+                }
+            });
+
+        } else {
+            // The API is not supported
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '20px';
+            modal.style.left = '50%';
+            modal.style.transform = 'translateX(-50%)';
+            modal.style.padding = '20px';
+            modal.style.background = '#f8d7da';
+            modal.style.color = '#721c24';
+            modal.style.border = '1px solid #f5c6cb';
+            modal.style.borderRadius = '8px';
+            modal.style.zIndex = '1000';
+            modal.innerText = "Sorry, your browser does not support text-to-speech.";
+            document.body.appendChild(modal);
+            setTimeout(() => modal.remove(), 5000);
+
+            readButton.disabled = true;
+            downloadButton.disabled = true;
+            textToReadEl.placeholder = "Speech features are not supported in this browser.";
+        }
+    </script>
+
+</body>
+</html>
