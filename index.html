@@ -3,20 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-3173691334411389">
     <title>Text to Speech</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* Set a light gray background for better contrast */
+            transition: background-color 0.5s ease;
+        }
+        /* Default Light Theme */
+        .theme-light {
             background-color: #f0f2f5;
         }
+        .theme-light .main-container {
+            background-color: #ffffff;
+            color: #1f2937;
+        }
+        .theme-light .main-container p {
+             color: #6b7280;
+        }
+        .theme-light .main-container textarea, .theme-light .main-container select {
+            background-color: #ffffff;
+            border-color: #d1d5db;
+            color: #111827;
+        }
+        .theme-light .main-container .read-button {
+            background-color: #2563eb;
+        }
+        .theme-light .main-container .download-button {
+            background-color: #16a34a;
+        }
+
+        /* Dark Theme */
+        .theme-dark {
+            background-color: #111827;
+        }
+        .theme-dark .main-container {
+            background-color: #1f2937;
+            color: #d1d5db;
+        }
+        .theme-dark .main-container p {
+             color: #9ca3af;
+        }
+        .theme-dark .main-container textarea, .theme-dark .main-container select {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #f9fafb;
+        }
+        .theme-dark .main-container .read-button {
+            background-color: #3b82f6;
+        }
+        .theme-dark .main-container .download-button {
+            background-color: #22c55e;
+        }
+
+        /* Neon Theme */
+        .theme-neon {
+            background-color: #0d0221;
+        }
+        .theme-neon .main-container {
+            background-color: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            color: #e0e7ff;
+        }
+        .theme-neon .main-container p {
+            color: #a5b4fc;
+        }
+        .theme-neon .main-container textarea, .theme-neon .main-container select {
+            background-color: #2e1065;
+            border-color: #7c3aed;
+            color: #e0e7ff;
+        }
+        .theme-neon .main-container .read-button {
+            background-color: #8b5cf6;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+        }
+        .theme-neon .main-container .download-button {
+            background-color: #0ea5e9;
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.5);
+        }
+
+        /* Serene Theme */
+        .theme-serene {
+            background-color: #f0fdf4;
+        }
+        .theme-serene .main-container {
+            background-color: #ffffff;
+            color: #1e40af;
+        }
+        .theme-serene .main-container p {
+            color: #1d4ed8;
+        }
+        .theme-serene .main-container textarea, .theme-serene .main-container select {
+            background-color: #eff6ff;
+            border-color: #93c5fd;
+            color: #1e3a8a;
+        }
+        .theme-serene .main-container .read-button {
+            background-color: #3b82f6;
+        }
+        .theme-serene .main-container .download-button {
+            background-color: #22c55e;
+        }
+
         /* Custom focus styles for better accessibility */
         .focus-styles:focus {
             outline: 2px solid transparent;
             outline-offset: 2px;
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.6); /* Blue focus ring for light theme */
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.6);
         }
         /* Custom placeholder color */
         .custom-placeholder::placeholder {
@@ -25,18 +121,9 @@
 
         /* Keyframes for the floating animation */
         @keyframes float {
-            0% {
-                transform: translateY(0px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            }
-            50% {
-                transform: translateY(-8px);
-                box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
-            }
-            100% {
-                transform: translateY(0px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            }
+            0% { transform: translateY(0px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+            50% { transform: translateY(-8px); box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15); }
+            100% { transform: translateY(0px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
         }
 
         /* Style for the individual floating icons */
@@ -44,83 +131,75 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 56px; /* w-14 */
-            height: 56px; /* h-14 */
-            border-radius: 9999px; /* rounded-full */
+            width: 56px;
+            height: 56px;
+            border-radius: 9999px;
             background-color: #ffffff;
             animation: float 4s ease-in-out infinite;
             transition: all 0.3s ease;
         }
 
         .social-icon:hover {
-            animation-play-state: paused; /* Pause floating on hover */
-            transform: translateY(-2px) scale(1.05); /* Slight lift and scale on hover */
+            animation-play-state: paused;
+            transform: translateY(-2px) scale(1.05);
         }
 
-        /* Stagger the animation start times for a more natural effect */
-        .social-icon.instagram {
-            animation-delay: 0s;
-        }
-        .social-icon.telegram {
-            animation-delay: 0.7s;
-        }
-        .social-icon.youtube {
-            animation-delay: 1.4s;
-        }
+        /* Stagger the animation start times */
+        .social-icon.instagram { animation-delay: 0s; }
+        .social-icon.telegram { animation-delay: 0.7s; }
+        .social-icon.youtube { animation-delay: 1.4s; }
+
         /* Style for disabled button */
-        .disabled-button {
-            background-color: #9ca3af;
-            cursor: not-allowed;
-        }
-        .disabled-button:hover {
-            background-color: #9ca3af;
-        }
+        .disabled-button { background-color: #9ca3af; cursor: not-allowed; }
+        .disabled-button:hover { background-color: #9ca3af; }
     </style>
 </head>
-<body class="flex items-center justify-center h-screen m-0 p-4">
+<body class="flex items-center justify-center h-screen m-0 p-4 theme-light">
 
-    <!-- Main container for the app -->
-    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-6">
+    <div id="main-container" class="w-full max-w-md mx-auto rounded-2xl shadow-lg p-8 space-y-6 main-container transition-colors duration-500">
         
-        <!-- App Header with Image -->
         <div class="text-center">
             <img src="logo.png" alt="App Logo" class="w-32 h-32 mx-auto rounded-full mb-4 object-cover border-4 border-gray-100 shadow-md" onerror="this.style.display='none'">
-            <p class="text-gray-500 mt-2 text-lg">Type something and I'll read it for you.</p>
+            <p class="mt-2 text-lg">Type something and I'll read it for you.</p>
         </div>
 
-        <!-- Text Input Area -->
         <div>
             <label for="text-to-read" class="sr-only">Text to read</label>
-            <textarea id="text-to-read" rows="5" class="w-full p-4 border border-gray-300 rounded-lg text-lg text-gray-700 focus-styles transition-shadow custom-placeholder" placeholder="Knowledge is power..."></textarea>
+            <textarea id="text-to-read" rows="5" class="w-full p-4 border rounded-lg text-lg focus-styles transition-shadow custom-placeholder" placeholder="Knowledge is power..."></textarea>
         </div>
 
-        <!-- Voice Selection Dropdown -->
-        <div>
-            <label for="voice-select" class="sr-only">Choose a voice:</label>
-            <select id="voice-select" class="w-full p-4 border border-gray-300 rounded-lg text-lg text-gray-700 focus-styles transition-shadow custom-placeholder bg-white appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: .65em auto;">
-                <!-- Voice options will be populated by JavaScript -->
-            </select>
-        </div>
-
-        <!-- Action Buttons -->
         <div class="grid grid-cols-2 gap-4">
-            <button id="read-button" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg text-lg hover:bg-blue-700 active:bg-blue-800 focus-styles transition-all transform active:scale-95">
+            <div>
+                <label for="voice-select" class="sr-only">Choose a voice:</label>
+                <select id="voice-select" class="w-full p-4 border rounded-lg text-lg focus-styles transition-shadow custom-placeholder appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: .65em auto;">
+                    </select>
+            </div>
+            <div>
+                 <label for="theme-select" class="sr-only">Choose a theme:</label>
+                <select id="theme-select" class="w-full p-4 border rounded-lg text-lg focus-styles transition-shadow custom-placeholder appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: .65em auto;">
+                    <option value="theme-light">Light</option>
+                    <option value="theme-dark">Dark Mode</option>
+                    <option value="theme-neon">Neon</option>
+                    <option value="theme-serene">Serene</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <button id="read-button" class="w-full text-white font-bold py-3 px-4 rounded-lg text-lg focus-styles transition-all transform active:scale-95 read-button">
                 Read Aloud
             </button>
-            <button id="download-button" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg text-lg hover:bg-green-700 active:bg-green-800 focus-styles transition-all transform active:scale-95">
+            <button id="download-button" class="w-full text-white font-bold py-3 px-4 rounded-lg text-lg focus-styles transition-all transform active:scale-95 download-button">
                 Download
             </button>
         </div>
         
-        <!-- Disclaimer for Download -->
         <div class="text-center">
-            <p class="text-xs text-gray-500">Note: Downloaded audio is a high-quality version and may differ from the live preview with special effects.</p>
+            <p class="text-xs">Note: Downloaded audio is a high-quality version and may differ from the live preview with special effects.</p>
         </div>
     </div>
 
-    <!-- Floating Social Media Icons -->
     <div class="fixed bottom-8 flex items-center space-x-6 left-1/2 -translate-x-1/2">
-        <!-- Instagram Icon -->
         <a href="https://www.instagram.com/sanjuhvk/?__pwa=1" target="_blank" rel="noopener noreferrer" title="Instagram" class="social-icon instagram group">
             <svg class="w-8 h-8" viewBox="0 0 24 24" aria-hidden="true">
                  <defs>
@@ -135,13 +214,11 @@
                 <path fill="url(#instagramGradient)" fill-rule="evenodd" d="M12 2C8.74 2 8.273.015 6.75.088c-1.52.073-2.57.348-3.46.72-1.002.378-1.85.88-2.67 1.708S.357 5.23.72 6.292c-.363.962-.648 2.058-.72 3.638C0 11.727 0 12.273 0 15.533c.002 3.26.015 3.727.088 5.25.073 1.52.348 2.57.72 3.46.378 1.002.88 1.85 1.708 2.67s1.67.93 2.67.292c.962.363 2.058.648 3.638.72 1.52.073 1.987.088 5.25.088s3.727-.015 5.25-.088c1.52-.073 2.57-.348 3.46-.72 1.002-.378 1.85-.88 2.67-1.708s.93-1.67.292-2.67c.363-.962.648-2.058.72-3.638.073-1.52.088-1.987.088-5.25s-.015-3.727-.088-5.25c-.073-1.52-.348-2.57-.72-3.46-.378-1.002-.88-1.85-1.708-2.67s-1.67-.93-2.67-.292c-.962-.363-2.058-.648-3.638-.72C15.727 2.015 15.26 2 12 2zm0 4a4 4 0 100 8 4 4 0 000-8zm-6 8a6 6 0 1112 0 6 6 0 01-12 0zm13-8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"/>
             </svg>
         </a>
-        <!-- Telegram Icon -->
         <a href="https://t.me/sanjuhvx" target="_blank" rel="noopener noreferrer" title="Telegram" class="social-icon telegram group">
             <svg class="w-8 h-8 text-sky-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M21.883 12.001L2 18l3.333-7.333L2 3.334l19.883 8.667zM5 16l12-4-12-4v3.5l8 1.5-8 1.5V16z"/>
             </svg>
         </a>
-        <!-- YouTube Icon -->
         <a href="https://www.youtube.com/channel/UCoirCSBz_bYOcYoI26pIPRQ" target="_blank" rel="noopener noreferrer" title="YouTube" class="social-icon youtube group">
             <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill-rule="evenodd" d="M21.582 6.186a2.69 2.69 0 00-1.898-1.898C18.008 4 12 4 12 4s-6.008 0-7.684.288a2.69 2.69 0 00-1.898 1.898C2 7.864 2 12 2 12s0 4.136.288 5.814a2.69 2.69 0 001.898 1.898C5.992 20 12 20 12 20s6.008 0 7.684-.288a2.69 2.69 0 001.898-1.898C22 16.136 22 12 22 12s0-4.136-.418-5.814zM9.75 15.5V8.5l6.5 3.5-6.5 3.5z" clip-rule="evenodd" />
@@ -157,8 +234,21 @@
         const downloadButton = document.getElementById('download-button');
         const textToReadEl = document.getElementById('text-to-read');
         const voiceSelect = document.getElementById('voice-select');
+        const themeSelect = document.getElementById('theme-select');
+        const bodyEl = document.querySelector('body');
+        const mainContainerEl = document.getElementById('main-container');
 
         let voices = [];
+        const themeClasses = ['theme-light', 'theme-dark', 'theme-neon', 'theme-serene'];
+
+        // Function to apply the selected theme
+        function applyTheme(theme) {
+            bodyEl.classList.remove(...themeClasses);
+            mainContainerEl.classList.remove(...themeClasses);
+            
+            bodyEl.classList.add(theme);
+            mainContainerEl.classList.add(theme);
+        }
 
         // Function to populate the voice select dropdown
         function populateVoiceList() {
@@ -315,6 +405,11 @@
                     downloadButton.innerHTML = originalButtonText;
                     downloadButton.disabled = false;
                 }
+            });
+
+            // Add event listener for theme changes
+            themeSelect.addEventListener('change', (e) => {
+                applyTheme(e.target.value);
             });
 
         } else {
